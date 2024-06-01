@@ -77,6 +77,7 @@ w, h = root.winfo_screenwidth(), root.winfo_screenheight()
 root.geometry("%dx%d+0+0" % (w, h))
 root.configure(background='black')
 root.title("Horus Decoder by 9A4AM")
+os.remove("log_horus")
 
 # Kreiraj gumb za pokretanje skripte
 start_button = tk.Button(root, text="Start decoder", command=run_horus_script)
