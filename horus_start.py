@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
-# Name:        horus_start.py
+# Name:        Horus decoder v2
 # Purpose:
 #
 # Author:      9A4AM
 #
-# Created:     31.05.2024
+# Created:     01.06.2024
 # Copyright:   (c) 9A4AM 2024
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -25,40 +25,40 @@ def run_horus_script():
     # Pokreni horus_start.sh skriptu
     process = subprocess.Popen(['./horus_start.sh'], preexec_fn=os.setsid)
 
-    # Pokreni proveru loga u zasebnoj niti
+    # Pokreni provjeru loga zasebno
     threading.Thread(target=update_log).start()
 
 def update_log():
-    # Proveri log fajl periodično
+    # Provjeri log fajl periodički
     while True:
         try:
             with open('log_horus', 'r') as log_file:
                 lines = log_file.readlines()
                 if lines:
                     last_line = lines[-1]
-                    # lat, lon, alt = parse_log_line(last_line)
-                    # update_text(lat, lon, alt)
-                    update_text(last_line)
+                    call, tim, lat, lon, alt, batt = parse_log_line(last_line)
+                    update_text(call, tim, lat, lon, alt, batt)
         except FileNotFoundError:
             pass
 
-        time.sleep(5)  # Proveravaj svakih 5 sekundi
+        time.sleep(3)  # Provjeravaj svakih 3 sekunde
 
 def parse_log_line(last_line):
-    # Parsiraj liniju loga i izvuci Lat, Lon, Alt
+    # Parsiraj liniju loga i izvuci Call, time, Lat, Lon, Alt, Dir, Batt
     parts = last_line.strip().split(',')
-    lat = parts[0].split('=')[1]
-    lon = parts[1].split('=')[1]
-    alt = parts[2].split('=')[1]
-    return lat, lon, alt
+    call = parts[0][3:]  # Makni prva tri karaktera
+    tim = parts[2]
+    lat = parts[3]
+    lon = parts[4]
+    alt = parts[5]
+    batt = parts[9][:4]
+    return call, tim, lat, lon, alt, batt
 
-# def update_text(lat, lon, alt):
-def update_text(last_line):
-    # Ažuriraj tekstualno polje sa novim vrednostima
+def update_text(call, tim, lat, lon, alt, batt):
+    # Ažuriraj tekstualno polje sa novim vrijednostimea
     text_widget.config(state=tk.NORMAL)
     text_widget.delete(1.0, tk.END)
-    # text_widget.insert(tk.END, f"Lat: {lat}\nLon: {lon}\nAlt: {alt}")
-    text_widget.insert(tk.END, f"Frequency: 437.600MHz\n Last packet:\n {last_line}\n")
+    text_widget.insert(tk.END, f"Frequency: 437.600MHz\nID: {call}  Time: {tim}\nLat: {lat}  Lon: {lon}  Alt: {alt}\nBatt: {batt}V")
     text_widget.config(state=tk.DISABLED)
 
 def stop_horus_script():
@@ -75,20 +75,20 @@ def stop_horus_script():
 root = tk.Tk()
 w, h = root.winfo_screenwidth(), root.winfo_screenheight()
 root.geometry("%dx%d+0+0" % (w, h))
+root.configure(background='black')
 root.title("Horus Decoder by 9A4AM")
 
-# Kreiraj dugme za pokretanje skripte
+# Kreiraj gumb za pokretanje skripte
 start_button = tk.Button(root, text="Start decoder", command=run_horus_script)
 start_button.pack(pady=10)
 
-# Kreiraj dugme za zaustavljanje skripte
+# Kreiraj gumb za zaustavljanje skripte
 stop_button = tk.Button(root, text="Stop decoder & Exit", command=stop_horus_script)
 stop_button.pack(pady=10)
 
-# Kreiraj skrolovani tekstualni widget za prikaz loga
-text_widget = scrolledtext.ScrolledText(root, width=40, height=4, state=tk.DISABLED)
+# Kreiraj tekstualni widget sa skrolanjem za prikaz loga
+text_widget = scrolledtext.ScrolledText(root, width=40, height=5, state=tk.DISABLED)
 text_widget.pack(pady=10)
 
 # Pokreni Tkinter glavni loop
 root.mainloop()
-
