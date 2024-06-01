@@ -27,7 +27,7 @@ def run_horus_script():
 
     # Pokreni provjeru loga zasebno
     threading.Thread(target=update_log).start()
-
+    start_button.config(state="disabled")
 def update_log():
     # Provjeri log fajl periodički
     while True:
