@@ -22,12 +22,14 @@ process = None
 
 def run_horus_script():
     global process
-    # Pokreni horus_start.sh skriptu
-    process = subprocess.Popen(['./horus_start.sh'], preexec_fn=os.setsid)
+
+	# Pokreni horus_start.sh skriptu
+    # process = subprocess.Popen(['./horus_start.sh'], preexec_fn=os.setsid)
 
     # Pokreni provjeru loga zasebno
     threading.Thread(target=update_log).start()
     start_button.config(state="disabled")
+
 def update_log():
     # Provjeri log fajl periodički
     while True:
@@ -58,7 +60,7 @@ def update_text(call, tim, lat, lon, alt, batt):
     # Ažuriraj tekstualno polje sa novim vrijednostimea
     text_widget.config(state=tk.NORMAL)
     text_widget.delete(1.0, tk.END)
-    text_widget.insert(tk.END, f"Frequency: 437.600MHz\nID: {call}  Time: {tim}\nLat: {lat}  Lon: {lon}  Alt: {alt}\nBatt: {batt}V")
+    text_widget.insert(tk.END, f"Frequency: 437.600MHz\nID: {call}\nLast received frame time: {tim}\nLat: {lat}  Lon: {lon}  Alt: {alt}m\nBatt: {batt}V")
     text_widget.config(state=tk.DISABLED)
 
 def stop_horus_script():
@@ -77,18 +79,17 @@ w, h = root.winfo_screenwidth(), root.winfo_screenheight()
 root.geometry("%dx%d+0+0" % (w, h))
 root.configure(background='black')
 root.title("Horus Decoder by 9A4AM")
-os.remove("log_horus")
-
+# os.remove("log_horus")
 # Kreiraj gumb za pokretanje skripte
-start_button = tk.Button(root, text="Start decoder", command=run_horus_script)
+start_button = tk.Button(root, text="START DECODER", command=run_horus_script, height = 3, width = 45, font = 'sans 9 bold', bg = 'green')
 start_button.pack(pady=10)
 
 # Kreiraj gumb za zaustavljanje skripte
-stop_button = tk.Button(root, text="Stop decoder & Exit", command=stop_horus_script)
+stop_button = tk.Button(root, text="STOP DECODER  &  EXIT", command=stop_horus_script, height = 3, width = 45, font = 'sans 9 bold', bg = 'red')
 stop_button.pack(pady=10)
 
 # Kreiraj tekstualni widget sa skrolanjem za prikaz loga
-text_widget = scrolledtext.ScrolledText(root, width=40, height=5, state=tk.DISABLED)
+text_widget = scrolledtext.ScrolledText(root, width=45, height=5, state=tk.DISABLED, font = 'sans 9 bold', bg = 'spring green')
 text_widget.pack(pady=10)
 
 # Pokreni Tkinter glavni loop
