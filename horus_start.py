@@ -23,8 +23,8 @@ process = None
 def run_horus_script():
     global process
 
-	# Pokreni horus_start.sh skriptu
-    # process = subprocess.Popen(['./horus_start.sh'], preexec_fn=os.setsid)
+    # Pokreni horus_start.sh skriptu
+    process = subprocess.Popen(['./horus_start.sh'], preexec_fn=os.setsid)
 
     # Pokreni provjeru loga zasebno
     threading.Thread(target=update_log).start()
@@ -79,7 +79,7 @@ w, h = root.winfo_screenwidth(), root.winfo_screenheight()
 root.geometry("%dx%d+0+0" % (w, h))
 root.configure(background='black')
 root.title("Horus Decoder by 9A4AM")
-# os.remove("log_horus")
+os.remove("log_horus")
 # Kreiraj gumb za pokretanje skripte
 start_button = tk.Button(root, text="START DECODER", command=run_horus_script, height = 3, width = 45, font = 'sans 9 bold', bg = 'green')
 start_button.pack(pady=10)
