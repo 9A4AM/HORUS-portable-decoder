@@ -11,6 +11,7 @@
 
 import tkinter as tk
 from tkinter import scrolledtext
+from tkinter import messagebox
 import subprocess
 import time
 import threading
@@ -39,11 +40,26 @@ def update_log():
                 if lines:
                     last_line = lines[-1]
                     call, tim, lat, lon, alt, batt = parse_log_line(last_line)
-                    update_text(call, tim, lat, lon, alt, batt)
+					freq = load_value(self)
+                    update_text(freq,call, tim, lat, lon, alt, batt)
         except FileNotFoundError:
             pass
 
         time.sleep(3)  # Provjeravaj svakih 3 sekunde
+		
+def load_value(self):
+    try:
+        with open("start.sh", "r") as file:
+            lines = file.readlines()
+            for line in lines:
+                if "RXFREQ=" in line:
+                    start_index = line.find("RXFREQ=") + len("RXFREQ=")
+                    self.current_value = line[start_index:start_index + 9]
+                    freq = (0, self.current_value)
+					return freq
+                    break
+    except FileNotFoundError:
+        messagebox.showerror("Error", "start.sh file not found")
 
 def parse_log_line(last_line):
     # Parsiraj liniju loga i izvuci Call, time, Lat, Lon, Alt, Dir, Batt
@@ -56,11 +72,11 @@ def parse_log_line(last_line):
     batt = parts[9][:4]
     return call, tim, lat, lon, alt, batt
 
-def update_text(call, tim, lat, lon, alt, batt):
+def update_text(freq, call, tim, lat, lon, alt, batt):
     # Ažuriraj tekstualno polje sa novim vrijednostimea
     text_widget.config(state=tk.NORMAL)
     text_widget.delete(1.0, tk.END)
-    text_widget.insert(tk.END, f"Frequency: 437.600MHz\nID: {call}\nLast received frame time: {tim}z\nLat: {lat}  Lon: {lon}  Alt: {alt}m\nBatt: {batt}V")
+    text_widget.insert(tk.END, f"Frequency: {freq}MHz\nID: {call}\nLast received frame time: {tim}z\nLat: {lat}  Lon: {lon}  Alt: {alt}m\nBatt: {batt}V")
     text_widget.config(state=tk.DISABLED)
 
 def stop_horus_script():
@@ -80,7 +96,7 @@ root.geometry("%dx%d+0+0" % (w, h))
 root.configure(background='black')
 root.title("Horus Decoder by 9A4AM")
 try:
-os.remove("log_horus") # Obriši stari log fajl
+    os.remove("log_horus") # Obriši stari log fajl
 except OSError:
     pass
 # Kreiraj gumb za pokretanje skripte
