@@ -10,5 +10,5 @@ HORUS portable decoder is based on Raspberry Pi (I use RPi3+) and LCD3.5" shield
 
 
 
-![alt tag](Capture.JPG)
+![alt tag](Captured.JPG)
 
