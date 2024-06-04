@@ -15,14 +15,22 @@ from tkinter import messagebox
 class RxFreqEditor:
     def __init__(self, root):
         self.root = root
-        self.root.title("RXFREQ Editor")
+        self.root.title("RXFREQ Editor by 9A4AM")
+        root.configure(background='black')
 
-        self.textbox = tk.Entry(root, font=("Helvetica", 16), justify='center')
+        text_var = tk.StringVar()
+        text_var.set("File = start_rtlsdr.sh -> Freq in Hertz")
+        label = tk.Label(root, textvariable=text_var,font=("Arial", 12, "bold"),bg="black", fg="yellow")
+        label.pack(pady=20)
+        self.textbox = tk.Entry(root, font = 'sans 22 bold', bg = 'light blue', justify='center')
         self.textbox.pack(pady=20)
         self.textbox.bind("<Button-1>", self.show_keyboard)
 
-        self.save_button = tk.Button(root, text="Save", command=self.save_value, font=("Helvetica", 16))
+        self.save_button = tk.Button(root, text="SAVE", command=self.save_value, height = 2, width = 25, font = 'sans 16 bold', bg = 'green')
         self.save_button.pack(pady=20)
+
+        self.exit_button = tk.Button(root, text="EXIT", command=self.exit_app, height = 2, width = 25, font = 'sans 16 bold', bg = 'red')
+        self.exit_button.pack(pady=20)
 
         self.load_value()
 
@@ -37,7 +45,7 @@ class RxFreqEditor:
                         self.textbox.insert(0, self.current_value)
                         break
         except FileNotFoundError:
-            messagebox.showerror("Error", "start.sh file not found")
+            messagebox.showerror("Error", "start_rtlsdr.sh file not found")
 
     def save_value(self):
         new_value = self.textbox.get()
@@ -56,10 +64,15 @@ class RxFreqEditor:
                         line = line[:start_index] + new_value + line[start_index + 9:]
                     file.write(line)
             messagebox.showinfo("Success", "Value saved successfully")
+            # self.root.quit()  # Zatvori aplikaciju
+            # self.exit_app()
         except FileNotFoundError:
-            messagebox.showerror("Error", "start.sh file not found")
+            messagebox.showerror("Error", "start_rtlsdr.sh file not found")
 
     def show_keyboard(self, event):
+        # Očisti textbox pri otvaranju tipkovnice
+        self.textbox.delete(0, tk.END)
+
         keyboard_window = tk.Toplevel(self.root)
         keyboard_window.title("Keyboard")
 
@@ -79,6 +92,7 @@ class RxFreqEditor:
             if key == "Clear":
                 self.textbox.delete(0, tk.END)
             elif key == "Enter":
+                self.save_value()  # Spremi vrijednost i zatvori aplikaciju
                 keyboard_window.destroy()
             else:
                 current_text = self.textbox.get()
@@ -89,6 +103,11 @@ class RxFreqEditor:
             action = lambda x=button: key_press(x)
             b = tk.Button(keyboard_window, text=button, width=5, height=2, command=action)
             b.grid(row=i//3, column=i%3)
+
+    def exit_app(self):
+        # self.root.quit()
+        root.destroy()
+        # sys.exit()
 
 if __name__ == "__main__":
     root = tk.Tk()
