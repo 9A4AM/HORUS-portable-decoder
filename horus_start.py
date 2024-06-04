@@ -25,7 +25,7 @@ def run_horus_script():
     global process
 
 	# Pokreni horus_start.sh skriptu
-    process = subprocess.Popen(['./horus_start.sh'], preexec_fn=os.setsid)
+    process = subprocess.Popen(['./start_rtlsdr.sh'], preexec_fn=os.setsid)
 
     # Pokreni provjeru loga zasebno
     threading.Thread(target=update_log).start()
@@ -64,7 +64,7 @@ def load_value(self):
 def parse_log_line(last_line):
     # Parsiraj liniju loga i izvuci Call, time, Lat, Lon, Alt, Dir, Batt
     parts = last_line.strip().split(',')
-    call = parts[0][3:]  # Makni prva tri karaktera
+    call = parts[0][2:]  # Makni prva dva  karaktera (za Linux 2, za Win 3)
     tim = parts[2]
     lat = parts[3]
     lon = parts[4]
